@@ -1,6 +1,0 @@
-services:
-  - type: web
-    name: my-laravel-app
-    env: php
-    buildCommand: "composer install --no-dev --optimize-autoloader && npm install && npm run build"
-    startCommand: "vendor/bin/heroku-php-apache2 public/"
