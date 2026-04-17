@@ -26,8 +26,11 @@ class DashboardController extends Controller
 
         // 2. DỮ LIỆU BIỂU ĐỒ CỘT: Số bài thi theo môn học
         // Trả về dạng: [{ subject: 'CTDL', count: 5 }, ...]
+        // 2. DỮ LIỆU BIỂU ĐỒ CỘT: Số bài thi theo môn học
         $examsBySubject = Exam::select('subjects.name as subject', DB::raw('count(*) as count'))
-            ->join('subjects', 'exams.subject_id', '=', 'subjects.id')
+            ->join('subjects', function($join) {
+                $join->on(DB::raw('CAST(exams.subject_id AS BIGINT)'), '=', 'subjects.id');
+            })
             ->groupBy('subjects.name')
             ->get();
 
