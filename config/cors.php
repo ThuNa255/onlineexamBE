@@ -16,7 +16,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173','https://onlineexambe.onrender.com'],
+    'allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173','https://onlineexambe.onrender.com', 'https://nhom12-trac-nghiem.vercel.app'],
 
     'allowed_origins_patterns' => [],
 
