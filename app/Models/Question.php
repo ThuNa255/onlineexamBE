@@ -25,6 +25,7 @@ class Question extends Model
         'option_c',
         'option_d',
         'correct_answer',
+        'subject',
         'subject_id',
         'difficulty'
     ];

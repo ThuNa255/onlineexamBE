@@ -34,13 +34,14 @@ class AuthController extends Controller
             ], 200);
         }
 
-        // 1. Tìm user theo email
-        $user = User::where('email', $request->email)->first();
+        // 1. Tìm user theo email hoặc MSSV
+        $user = User::where('email', $request->email)
+            ->orWhere('mssv', $request->email)
+            ->first();
 
-    // 2. Nếu không tìm thấy email trong Database
+    // 2. Nếu không tìm thấy tài khoản trong Database
     if (!$user) {
-        // Dùng response() thay vì response()->json() để né lỗi ResponseHeaderBag của PHP
-        return response(['message' => 'Không tìm thấy tài khoản với email này!'], 401);
+        return response(['message' => 'Không tìm thấy tài khoản với email hoặc MSSV này!'], 401);
     }
 
     // 3. Nếu sai mật khẩu

@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Question;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 
 class QuestionController extends Controller
 {
@@ -15,7 +17,11 @@ class QuestionController extends Controller
 
         // Xử lý bộ lọc từ frontend truyền lên
         if ($request->has('subject') && $request->subject !== 'all') {
-            $query->where('subject_id', $request->subject);
+            if (Schema::hasColumn('questions', 'subject_id')) {
+                $query->where('subject_id', $request->subject);
+            } else {
+                $query->where('subject', $request->subject);
+            }
         }
 
         if ($request->has('difficulty') && $request->difficulty !== 'all') {
@@ -23,11 +29,18 @@ class QuestionController extends Controller
         }
 
         // Nếu bảng SQL của bạn không có cột created_at, hãy xóa hàm orderBy này
-        $questions = $query
-            ->select('questions.*', 'subjects.name as subject_name')
-            ->leftJoin('subjects', 'questions.subject_id', '=', 'subjects.id')
-            ->orderBy('questions.created_at', 'desc')
-            ->get();
+        if (Schema::hasColumn('questions', 'subject_id') && Schema::hasTable('subjects')) {
+            $questions = $query
+                ->select('questions.*', 'subjects.name as subject_name')
+                ->leftJoin('subjects', 'questions.subject_id', '=', 'subjects.id')
+                ->orderBy('questions.created_at', 'desc')
+                ->get();
+        } else {
+            $questions = $query
+                ->select('questions.*', DB::raw('questions.subject as subject_name'))
+                ->orderBy('questions.created_at', 'desc')
+                ->get();
+        }
         
         return response()->json($questions);
     }
@@ -36,7 +49,7 @@ class QuestionController extends Controller
     public function store(Request $request)
     {
         // 1. Validate dữ liệu từ React gửi lên
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge([
             'exam_id' => 'nullable|integer', // Có thể thuộc bài thi hoặc nằm trong ngân hàng chung
             'content' => 'required|string',
             'option_a' => 'required|string',
@@ -44,9 +57,12 @@ class QuestionController extends Controller
             'option_c' => 'required|string',
             'option_d' => 'required|string',
             'correct_answer' => 'required|in:A,B,C,D',
-            'subject_id' => 'required|integer|exists:subjects,id',
             'difficulty' => 'required|in:easy,medium,hard'
-        ]);
+        ], Schema::hasColumn('questions', 'subject_id') ? [
+            'subject_id' => 'required|integer|exists:subjects,id'
+        ] : [
+            'subject' => 'required|string|max:255'
+        ]));
 
         // 2. Lưu vào DB theo đúng cấu trúc của xdpmw_test.sql
         $question = Question::create($validated);
@@ -65,16 +81,19 @@ class QuestionController extends Controller
         // Tìm theo ID (hoặc khóa chính tương ứng trong DB của bạn)
         $question = Question::findOrFail($id);
 
-        $validated = $request->validate([
+        $validated = $request->validate(array_merge([
             'content' => 'sometimes|required|string',
             'option_a' => 'sometimes|required|string',
             'option_b' => 'sometimes|required|string',
             'option_c' => 'sometimes|required|string',
             'option_d' => 'sometimes|required|string',
             'correct_answer' => 'sometimes|required|in:A,B,C,D',
-            'subject_id' => 'sometimes|required|integer|exists:subjects,id',
             'difficulty' => 'sometimes|required|in:easy,medium,hard'
-        ]);
+        ], Schema::hasColumn('questions', 'subject_id') ? [
+            'subject_id' => 'sometimes|required|integer|exists:subjects,id'
+        ] : [
+            'subject' => 'sometimes|required|string|max:255'
+        ]));
 
         $question->update($validated);
 

@@ -11,6 +11,12 @@ use App\Http\Controllers\StudentController;
 use App\Http\Controllers\SubjectController;
 use App\Http\Controllers\UserController;
 // Tuyến đường công khai (Không cần token)
+Route::get('/login', function () {
+    return response()->json([
+        'message' => 'Use POST /api/login with {email, password} to authenticate.',
+    ], 200);
+});
+
 Route::post('/login', [AuthController::class, 'login']);
 
 // Tuyến đường được bảo vệ (Bắt buộc phải truyền Bearer Token trong Header)
@@ -19,10 +25,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [App\Http\Controllers\AuthController::class, 'logout']);
 });
 
-Route::prefix('student')->group(function () {
+Route::prefix('student')->middleware('auth:sanctum')->group(function () {
         Route::get('/exams', [ExamController::class, 'studentExams']); 
         Route::get('/exams/{id}', [ExamController::class, 'showForStudent']); 
         Route::post('/exams/{id}/submit', [ResultController::class, 'submit']); 
+        Route::get('/exams/{id}/result', [ResultController::class, 'showForStudent']); 
         Route::get('/results', [ResultController::class, 'myResults']); 
         Route::get('/dashboard', [DashboardController::class, 'studentDashboard']);
     });

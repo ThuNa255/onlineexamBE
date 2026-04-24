@@ -11,6 +11,7 @@ class Exam extends Model
 
     protected $fillable = [
         'name',
+        'subject',
         'subject_id',
         'start_time',
         'end_time',
@@ -22,7 +23,17 @@ class Exam extends Model
 
     public function subject()
     {
-        return $this->belongsTo(Subject::class);
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function subjectRelation()
+    {
+        return $this->belongsTo(Subject::class, 'subject_id');
+    }
+
+    public function getSubjectNameAttribute(): ?string
+    {
+        return $this->subject?->name ?? $this->subject;
     }
 
     // Mối quan hệ: Một bài thi có nhiều câu hỏi

@@ -17,7 +17,8 @@ class UserController extends Controller
             $searchTerm = '%' . $request->search . '%';
             $query->where(function($q) use ($searchTerm) {
                 $q->where('name', 'like', $searchTerm)
-                  ->orWhere('email', 'like', $searchTerm);
+                  ->orWhere('email', 'like', $searchTerm)
+                  ->orWhere('mssv', 'like', $searchTerm);
             });
         }
 
@@ -33,7 +34,8 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
-            'role' => 'required|string'
+            'role' => 'required|string',
+            'mssv' => 'sometimes|nullable|string|max:255|unique:users,mssv',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -55,7 +57,8 @@ class UserController extends Controller
             'name' => 'sometimes|required|string|max:255',
             'email' => 'sometimes|required|email|unique:users,email,' . $id,
             'password' => 'nullable|string|min:6',
-            'role' => 'sometimes|required|string'
+            'role' => 'sometimes|required|string',
+            'mssv' => 'sometimes|nullable|string|max:255|unique:users,mssv,' . $id,
         ]);
 
         if (!empty($validated['password'])) {

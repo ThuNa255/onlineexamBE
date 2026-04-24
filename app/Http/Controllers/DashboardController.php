@@ -8,6 +8,7 @@ use App\Models\Result;
 use App\Models\Subject;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Carbon\Carbon;
 
 class DashboardController extends Controller
@@ -26,10 +27,18 @@ class DashboardController extends Controller
 
         // 2. DỮ LIỆU BIỂU ĐỒ CỘT: Số bài thi theo môn học
         // Trả về dạng: [{ subject: 'CTDL', count: 5 }, ...]
-        $examsBySubject = Exam::select('subjects.name as subject', DB::raw('count(*) as count'))
-            ->join('subjects', 'exams.subject_id', '=', 'subjects.id')
-            ->groupBy('subjects.name')
-            ->get();
+        if (Schema::hasTable('subjects') && Schema::hasColumn('exams', 'subject_id')) {
+            $examsBySubject = Exam::select('subjects.name as subject', DB::raw('count(*) as count'))
+                ->join('subjects', 'exams.subject_id', '=', 'subjects.id')
+                ->groupBy('subjects.name')
+                ->get();
+        } elseif (Schema::hasColumn('exams', 'subject')) {
+            $examsBySubject = Exam::select('subject as subject', DB::raw('count(*) as count'))
+                ->groupBy('subject')
+                ->get();
+        } else {
+            $examsBySubject = collect([]);
+        }
 
         // 3. DỮ LIỆU BIỂU ĐỒ ĐƯỜNG: Điểm trung bình 7 ngày gần nhất
         // Trả về dạng: [{ date: '15/03', avgScore: 75 }, ...]

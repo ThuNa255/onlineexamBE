@@ -19,7 +19,8 @@ class User extends Authenticatable
         'email',
         'password',
         'role', // Dùng để phân biệt Admin và Student
-        // Thêm các cột khác từ database của bạn (ví dụ: mssv, class...)
+        'mssv',
+        // Thêm các cột khác từ database của bạn (ví dụ: class...)
     ];
 
     protected $hidden = [

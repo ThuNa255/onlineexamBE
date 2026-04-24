@@ -16,7 +16,16 @@ class Result extends Model
         'total_correct',// Số câu đúng
         'total_questions',
         'submitted_at',
-        'completed_at'  // Thời gian hoàn thành bài thi
+        'completed_at', // Thời gian hoàn thành bài thi
+        'question_ids', // JSON array chứa danh sách ID câu hỏi đã gửi
+        'answers'       // JSON object chứa câu trả lời của sinh viên
+    ];
+
+    protected $casts = [
+        'question_ids' => 'array',
+        'answers' => 'array',
+        'submitted_at' => 'datetime',
+        'completed_at' => 'datetime',
     ];
 
     // Mối quan hệ
