@@ -34,7 +34,7 @@ class DashboardController extends Controller
                 ->get();
         } elseif (Schema::hasColumn('exams', 'subject')) {
             $examsBySubject = Exam::select('subject as subject', DB::raw('count(*) as count'))
-                ->groupBy('subject')
+                ->groupBy('exams.subject')
                 ->get();
         } else {
             $examsBySubject = collect([]);
@@ -45,8 +45,8 @@ class DashboardController extends Controller
         $recentResults = DB::table('results')
             ->select(DB::raw('DATE(completed_at) as date_val'), DB::raw('ROUND(AVG(score), 1) as avgScore'))
             ->where('completed_at', '>=', Carbon::now()->subDays(7))
-            ->groupBy('date_val')
-            ->orderBy('date_val', 'asc')
+            ->groupByRaw('DATE(completed_at)')
+            ->orderByRaw('DATE(completed_at) ASC')
             ->get()
             ->map(function ($item) {
                 return [
