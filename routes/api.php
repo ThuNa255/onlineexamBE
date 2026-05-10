@@ -33,7 +33,7 @@ Route::prefix('student')->middleware('auth:sanctum')->group(function () {
         Route::get('/results', [ResultController::class, 'myResults']); 
         Route::get('/dashboard', [DashboardController::class, 'studentDashboard']);
     });
-
+//a
 Route::prefix('admin')->middleware('auth:sanctum')->group(function () {
         // apiResource sẽ tự tạo các route: GET /exams, POST /exams, GET /exams/{id}, PUT /exams/{id}, DELETE /exams/{id}
         Route::get('/dashboard', [DashboardController::class, 'index']);
